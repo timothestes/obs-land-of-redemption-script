@@ -29,3 +29,7 @@ Then input the settings:
 
 The script won't update the text source unless you save the game file. Its important to save the game in order for the text to update.
 
+
+If everything is working, you should see your text source being updated as you add cards to the land of redemption and saving the game!
+
+![Alt text](assets/demo-lackey.png)
