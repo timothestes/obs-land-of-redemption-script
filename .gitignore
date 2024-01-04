@@ -160,4 +160,5 @@ cython_debug/
 #.idea/
 assets/*
 !assets/image.png
+!assets/demo-lackey.png
 .DS_Store
