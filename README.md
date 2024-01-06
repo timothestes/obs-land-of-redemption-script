@@ -13,9 +13,9 @@ Remember what you name this source. You'll need it in the next step.
 
 ### 3) Then you'll want to add the script to OBS
 
-Save `lackey-saved-game-redemption-07.py` to a safe place on your computer.
+Save `lackey-saved-game-redemption-08.py` to a safe place on your computer.
 
-Go to OBS -> Tools -> Scripts -> Plus Button -> and add `lackey-saved-game-redemption-07.py`
+Go to OBS -> Tools -> Scripts -> Plus Button -> and add `lackey-saved-game-redemption-08.py`
 
 Then input the settings:
 
@@ -33,3 +33,6 @@ The script won't update the text source unless you save the game file. Its impor
 If everything is working, you should see your text source being updated as you add cards to the land of redemption and saving the game!
 
 ![Alt text](assets/demo-lackey.png)
+
+
+## If you are alarmed that the score isn't updating, make sure to save the game, then check if it updates!
