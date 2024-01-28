@@ -43,9 +43,9 @@ def parse_file(tree: ET.ElementTree) -> dict:
     return players_zone3_cards
 
 
-def count_cards(players_zone3_cards: dict[str], lackey_username: str) -> list[str]:
+def count_cards(players_zone3_cards: dict, lackey_username: str = "") -> list[str]:
     """
-    Counts the number of cards for each player and sorts the scores with the user's score first (if username provided).
+    Counts the number of cards for each player. Sorts the scores with the user's score first if a lackey username is provided.
 
     Args:
         players_zone3_cards (dict): A dictionary containing players and their corresponding cards.
@@ -54,13 +54,22 @@ def count_cards(players_zone3_cards: dict[str], lackey_username: str) -> list[st
     Returns:
         list[str]: A list containing the number of cards for each player, sorted with the user's score first if username is provided.
     """
-    # Convert lackey_username to uppercase for case-insensitive comparison
-    lackey_username_upper = lackey_username.upper()
-    # Sort players with the user's score first if username is provided
-    sorted_players = sorted(
-        players_zone3_cards.keys(),
-        key=lambda player: (player.upper() != lackey_username_upper, player.upper()),
-    )
+    # Only perform sorting if lackey_username is provided and non-empty
+    if lackey_username:
+        # Convert lackey_username to uppercase for case-insensitive comparison
+        lackey_username_upper = lackey_username.upper()
+
+        # Sort players with the user's score first
+        sorted_players = sorted(
+            players_zone3_cards.keys(),
+            key=lambda player: (
+                player.upper() != lackey_username_upper,
+                player.upper(),
+            ),
+        )
+    else:
+        # If no username is provided, use the original order
+        sorted_players = players_zone3_cards.keys()
 
     output = []
     for player in sorted_players:
