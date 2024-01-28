@@ -11,6 +11,7 @@ interval = 100
 search_all = False
 namespace = ""
 source_name = ""
+lackey_username = ""
 
 
 def parse_file(tree: ET.ElementTree) -> dict:
@@ -42,18 +43,27 @@ def parse_file(tree: ET.ElementTree) -> dict:
     return players_zone3_cards
 
 
-def count_cards(players_zone3_cards: dict) -> list[str]:
+def count_cards(players_zone3_cards: dict[str], lackey_username: str) -> list[str]:
     """
-    Counts the number of cards for each player.
+    Counts the number of cards for each player and sorts the scores with the user's score first (if username provided).
 
     Args:
-    players_zone3_cards (dict): A dictionary containing players and their corresponding cards.
+        players_zone3_cards (dict): A dictionary containing players and their corresponding cards.
+        lackey_username (str): The username of the user, used for sorting. Optional.
 
     Returns:
-    list[str]: A list containing the number of cards for each player.
+        list[str]: A list containing the number of cards for each player, sorted with the user's score first if username is provided.
     """
+    # Convert lackey_username to uppercase for case-insensitive comparison
+    lackey_username_upper = lackey_username.upper()
+    # Sort players with the user's score first if username is provided
+    sorted_players = sorted(
+        players_zone3_cards.keys(),
+        key=lambda player: (player.upper() != lackey_username_upper, player.upper()),
+    )
+
     output = []
-    for player in players_zone3_cards:
+    for player in sorted_players:
         n_souls = len(players_zone3_cards[player])
         output.append(str(n_souls))
     return output
@@ -65,25 +75,20 @@ def update_text():
     """
     global url
     global source_name
+    global lackey_username
 
     if isfile(url):
         try:
             tree = ET.parse(url)
-            apply_xml_to_source(tree, source_name)
+            apply_xml_to_source(tree, source_name, lackey_username)
+
         except Exception as e:
             print(f"Error: {e}")
 
 
-def apply_xml_to_source(tree, source_name: str):
-    """
-    Applies the extracted XML data to the OBS source.
-
-    Args:
-    tree (ET.ElementTree): The XML tree containing the data.
-    source_name (str): The name of the OBS source to be updated.
-    """
+def apply_xml_to_source(tree, source_name: str, lackey_username: str):
     zone_3_output = parse_file(tree)
-    n_souls = count_cards(zone_3_output)
+    n_souls = count_cards(zone_3_output, lackey_username)
     source = obs.obs_get_source_by_name(source_name)
 
     if n_souls and source:
@@ -123,11 +128,12 @@ def script_update(settings):
     Args:
     settings: OBS data settings.
     """
-    global url, interval, source_name
+    global url, interval, source_name, lackey_username
 
     url = obs.obs_data_get_string(settings, "url")
     interval = obs.obs_data_get_int(settings, "interval")
     source_name = obs.obs_data_get_string(settings, "text_source_name")
+    lackey_username = obs.obs_data_get_string(settings, "lackey_username")
 
     obs.timer_remove(update_text)
     if url:
@@ -163,6 +169,12 @@ def script_properties():
     )
     obs.obs_properties_add_text(
         props, "text_source_name", "Source name to update:", obs.OBS_TEXT_DEFAULT
+    )
+    obs.obs_properties_add_text(
+        props,
+        "lackey_username",
+        "Your Lackey Username (used to help show the score consistently, optional)",
+        obs.OBS_TEXT_DEFAULT,
     )
     obs.obs_properties_add_int(props, "interval", "Update Interval (ms)", 1, 9999, 1)
     obs.obs_properties_add_button(props, "button", "Refresh", refresh_pressed)
