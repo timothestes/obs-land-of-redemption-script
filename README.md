@@ -13,9 +13,9 @@ Remember what you name this source. You'll need it in the next step.
 
 ### 3) Then you'll want to add the script to OBS
 
-Save `lackey-saved-game-redemption-11.py` to a safe place on your computer.
+Save `lackey-saved-game-redemption-15.py` to a safe place on your computer.
 
-Go to OBS -> Tools -> Scripts -> Plus Button -> and add `lackey-saved-game-redemption-11.py`
+Go to OBS -> Tools -> Scripts -> Plus Button -> and add `lackey-saved-game-redemption-15.py`
 
 Reopen OBS -> Tools -> Scripts then input the settings:
 
@@ -25,7 +25,7 @@ Reopen OBS -> Tools -> Scripts then input the settings:
 - Your Source Name should match a text source in OBS!
 ![Alt text](assets/image.png)
 
-- Your Lackey User Name should match your username you have in Lackey (optional)
+- Your Lackey User Name should match your username you have in Lackey (optional, used for sorting the output)
 
 ### 4) Once the Script is ready, open up lackey and drag a card into the Land of Redemption, then **save the game**.
 

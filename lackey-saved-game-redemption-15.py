@@ -12,6 +12,7 @@ search_all = False
 namespace = ""
 source_name = ""
 lackey_username = ""
+display_usernames = False
 
 
 def parse_file(tree: ET.ElementTree) -> dict:
@@ -43,7 +44,11 @@ def parse_file(tree: ET.ElementTree) -> dict:
     return players_zone3_cards
 
 
-def count_cards(players_zone3_cards: dict, lackey_username: str = "") -> list[str]:
+def count_cards(
+    players_zone3_cards: dict,
+    lackey_username: str = "",
+    display_usernames: bool = False,
+) -> list[str]:
     """
     Counts the number of cards for each player. Sorts the scores with the user's score first if a lackey username is provided.
 
@@ -74,6 +79,8 @@ def count_cards(players_zone3_cards: dict, lackey_username: str = "") -> list[st
     output = []
     for player in sorted_players:
         n_souls = len(players_zone3_cards[player])
+        if display_usernames:
+            n_souls = f"{player}: {n_souls}"
         output.append(str(n_souls))
     return output
 
@@ -85,23 +92,29 @@ def update_text():
     global url
     global source_name
     global lackey_username
+    global display_usernames
 
     if isfile(url):
         try:
             tree = ET.parse(url)
-            apply_xml_to_source(tree, source_name, lackey_username)
+            apply_xml_to_source(tree, source_name, lackey_username, display_usernames)
 
         except Exception as e:
             print(f"Error: {e}")
 
 
-def apply_xml_to_source(tree, source_name: str, lackey_username: str):
+def apply_xml_to_source(
+    tree, source_name: str, lackey_username: str, display_usernames: bool
+):
     zone_3_output = parse_file(tree)
-    n_souls = count_cards(zone_3_output, lackey_username)
+    n_souls = count_cards(zone_3_output, lackey_username, display_usernames)
     source = obs.obs_get_source_by_name(source_name)
 
     if n_souls and source:
-        text_to_put = f"Soul Count: {'-'.join(n_souls)}"
+        if display_usernames:
+            text_to_put = "\n".join(n_souls)
+        else:
+            text_to_put = str("- ".join(n_souls))
         settings = obs.obs_data_create()
         obs.obs_data_set_string(settings, "text", text_to_put)
         obs.obs_source_update(source, settings)
@@ -137,12 +150,13 @@ def script_update(settings):
     Args:
     settings: OBS data settings.
     """
-    global url, interval, source_name, lackey_username
+    global url, interval, source_name, lackey_username, display_usernames
 
     url = obs.obs_data_get_string(settings, "url")
     interval = obs.obs_data_get_int(settings, "interval")
     source_name = obs.obs_data_get_string(settings, "text_source_name")
     lackey_username = obs.obs_data_get_string(settings, "lackey_username")
+    display_usernames = obs.obs_data_get_bool(settings, "display_usernames")
 
     obs.timer_remove(update_text)
     if url:
@@ -175,6 +189,11 @@ def script_properties():
         obs.OBS_TEXT_DEFAULT,
         "*.txt",
         "",
+    )
+    obs.obs_properties_add_bool(
+        props,
+        name="display_usernames",
+        description="Show Lackey Usernames",
     )
     obs.obs_properties_add_text(
         props, "text_source_name", "Source name to update:", obs.OBS_TEXT_DEFAULT
